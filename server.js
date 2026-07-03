@@ -18,10 +18,32 @@ const io = new Server(server,{
 io.on("connection",(socket)=>{ // event call when someone entires, each user has there own socketId which is unique, socket.id identify connection not usename
 
      console.log("User Connected:", socket.id);
+     
+
+    socket.on("send_message", (data) => {
+
+    console.log("Sender Socket ID:", socket.id);
+    console.log("Sender Username:", data.username);
+
+    socket.to(data.room).emit("receive_message",data) // send data to every one in the room
+    });
+
+    socket.on("join_room",(data)=>{
+        socket.join(data.room)  // join the room 
+        socket.to(data.room).emit("user_joined",data)
+    })
+
+    socket.on("typing",(data)=>{
+        io.to(data.room).emit("is_typing",data)
+    })
+
+    socket.on("stop_typing",(data)=>{
+        socket.to(data.room).emit("stop_typing",data)
+    })
 
     socket.on("disconnect",()=>{ // when someone disconnect the disconnect event call the socket.on runs
    
-        console.log("naruto left")
+        console.log("Naruto Left")
 })
 
 });
