@@ -4,16 +4,16 @@ const app = express(); // creating express application and storing in  variable 
 
 const http = require("http") // importing http from node.js not installed like express by default it comes from node.
 
-const server = http.createServer(app) // creating a server and using express application app for handaling http server.
+const server = http.createServer(app) // creating a server and using express application app for handling http server.
 
 const {Server} = require("socket.io") // importing server from socket.io this socket.io we installed  it.
 
 const io = new Server(server,{
     cors: {
-        origin: "http://localhost:5173",
+        origin: "http://localhost:5173", // frontend 
         methods: ["GET", "POST"]
     }
-}) // it tells create socket.io server and attach it to our HTTP server
+}) // it tell's create socket.io server and attach it to our HTTP server
 
 const users = [] // stores usere who joined 
 
@@ -24,11 +24,19 @@ io.on("connection",(socket)=>{ // event call's when someone entires, each user h
 
     socket.on("send_message", (data,callback) => {  // send data by calling event
 
+        if(!data.text){  // acknowlegment give response for sender from receiver whether message sent or not 
+            callback({
+                success:false,
+                message : "message cannot be empty"
+            })
+        }
+
+
     console.log("Sender Socket ID:", socket.id); 
     console.log("Sender Username:", data.username);
 
-    callback({
-        success:"Successful"
+    callback({ // acknowlegment give response for sender from receiver whether message sent or not 
+        success:"Successfull"
     })
 
     io.to(data.room).emit("receive_message",data) // send data to every one in the room
@@ -37,25 +45,25 @@ io.on("connection",(socket)=>{ // event call's when someone entires, each user h
     socket.on("join_room",(data)=>{
         socket.join(data.room)  // join the room 
 
-        users.push({
+        users.push({    // push datails from the user to users  
             socketId : socket.id,
             username : data.username,
             room : data.room 
         })
 
-        const roomUsers = users.filter(each => each.room === data.room)
+        const roomUsers = users.filter(each => each.room === data.room)  // filter the users who are belongs to same romms
 
-        io.to(data.room).emit("room_users",roomUsers)
+        io.to(data.room).emit("room_users",roomUsers) // send to all in the room
       
-        socket.to(data.room).emit("user_joined",data)
+        socket.to(data.room).emit("user_joined",data) // except user send to all the room 
     })
 
     socket.on("typing",(data)=>{
-        socket.to(data.room).emit("is_typing",data)
+        socket.to(data.room).emit("is_typing",data) // indicate typing to the receivers
     })
 
     socket.on("stop_typing",(data)=>{
-        socket.to(data.room).emit("stop_typing",data)
+        socket.to(data.room).emit("stop_typing",data)  // indicate typing to the receivers
     })
 
     socket.on("disconnect",()=>{ // when someone disconnect the disconnect event call the socket.on runs
@@ -68,7 +76,7 @@ io.on("connection",(socket)=>{ // event call's when someone entires, each user h
 
             const roomUsers = users.filter(each => each.room === disconnectedUser.room )
 
-            io.to(disconnectedUser.room).emit("room_users",roomUsers)
+            io.to(disconnectedUser.room).emit("room_users",roomUsers)  // send the notification to user about existed user
             
             console.log(`${disconnectedUser.username} left ${disconnectedUser.room}`)
         } 
