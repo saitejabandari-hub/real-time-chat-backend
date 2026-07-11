@@ -1,0 +1,26 @@
+
+POST http://localhost:5000/auth/register 
+Content-Type: application/json
+
+{
+    "name":"Sasuke",
+    "email":"sasuke@gmail.com",
+    "number":987654321,
+    "password":"123456"
+}
+
+###
+
+GET http://localhost:5000/auth/profile 
+Content-Type: application/json 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTUyODFhMzYwYWFjOTYwNzkwN2MyOTYiLCJpYXQiOjE3ODM3OTIwMzUsImV4cCI6MTc4NjM4NDAzNX0.p_NrnTo3bWXJadqlqzTvtmVBhMSXysMtVTdpWZctF48
+
+###
+
+POST http://localhost:5000/auth/login 
+Content-Type: application/json 
+
+{
+    "email":"naruto@gmail.com",
+    "password": "568765865"
+}
